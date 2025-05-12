@@ -24,6 +24,8 @@ function getRecipesFromStorage() {
 	// A9. TODO - Complete the functionality as described in this function
 	//           header. It is possible in only a single line, but should
 	//           be no more than a few lines.
+	return JSON.parse(localStorage.getItem("recipes"))
+
 }
 
 /**
@@ -35,10 +37,16 @@ function getRecipesFromStorage() {
  */
 function addRecipesToDocument(recipes) {
 	// A10. TODO - Get a reference to the <main> element
+	let main = document.querySelector('main')
 	// A11. TODO - Loop through each of the recipes in the passed in array,
 	//            create a <recipe-card> element for each one, and populate
 	//            each <recipe-card> with that recipe data using element.data = ...
 	//            Append each element to <main>
+	for (let i = 0; i < recipes.length; i++) {
+		const recipeCard = document.createElement('recipe-card')
+		recipeCard.data = recipes[i]
+		main.appendChild(recipeCard)
+	}
 }
 
 /**
@@ -51,14 +59,18 @@ function saveRecipesToStorage(recipes) {
 	// B1. TODO - Complete the functionality as described in this function
 	//            header. It is possible in only a single line, but should
 	//            be no more than a few lines.
+	localStorage.setItem('recipes', JSON.stringify(recipes))
 }
 
 /**
  * Adds the necessary event handlers to <form> and the clear storage
  * <button>.
  */
+// we basically just take the info from form and add it to local storage and then call saverecipietostorage defined above
+// we also gotta make the clear button work
 function initFormHandler() {
 	// B2. TODO - Get a reference to the <form> element
+	const form = document.querySelector('form')
 	// B3. TODO - Add an event listener for the 'submit' event, which fires when the
 	//            submit button is clicked
 	// Steps B4-B9 will occur inside the event listener from step B3
@@ -76,4 +88,39 @@ function initFormHandler() {
 	// Steps B12 & B13 will occur inside the event listener from step B11
 	// B12. TODO - Clear the local storage
 	// B13. TODO - Delete the contents of <main>
+	form.addEventListener('submit', e => {
+		// NEVER FORGET TO ADD THIS
+		e.preventDefault()
+		// B4
+		// dumb formdata is FormData with CAPITAL F
+		let formData = new FormData(form)
+		// B5
+		let temp = {}
+		for (const [key, value] of formData.entries()) {
+		temp[key] = value
+		}
+		// B6
+		let newCard = document.createElement('recipe-card')
+		// B7
+		newCard.data = temp
+		// B8
+		document.querySelector('main').appendChild(newCard)
+
+		// B9
+		// we get local storage, add new recepie, save
+		let recipes = getRecipesFromStorage()
+		recipes.push(temp)
+		saveRecipesToStorage(recipes)
+	})
+
+	// B10
+	let clearBtn = document.querySelector('button[type="button"]'); 
+
+	// B11
+	clearBtn.addEventListener('click', () => {
+		// B12
+		localStorage.clear();
+		// B13
+		document.querySelector('main').innerHTML = '';
+	});
 }
